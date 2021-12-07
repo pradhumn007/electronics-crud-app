@@ -1,0 +1,51 @@
+:root{
+    --box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+body{
+    background-color: #faaacb;
+}
+
+h1{
+    text-shadow: 2px 2px 4px #000000;
+}
+
+.d-flex input{
+    margin: .8rem 0rem;
+    border: none;
+    border-radius: 5px;
+    background-color: whitesmoke;
+}
+
+form{
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: var(--box-shadow);
+}
+
+form .row .col{
+    margin: 12.8px 0;
+}
+
+.d-flex button{
+    margin: 2rem;
+    padding: .3rem 1rem;
+    box-shadow: var(--box-shadow);
+}
+
+.container table{
+    box-shadow: var(--box-shadow);
+}
+
+
+
+table .btnedit{
+    color: #3f3852;
+    cursor: pointer;
+}
+
+table .btn-delete{
+    color: red;
+    cursor: pointer;
+}
+
