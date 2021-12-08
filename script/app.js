@@ -1,4 +1,3 @@
-
 // product details
 
 const pId = document.getElementById("productId");
@@ -21,30 +20,21 @@ createBtn.addEventListener("click", function () {
 
 readBtn.addEventListener("click", function () {
   read();
-  // let x = read();
-  // if (x.style.display === "none") {
-  //   x.style.display = "block";
-  // } else {
-  //   x.style.display = "none";
-  // }
 });
 
-updateBtn.addEventListener('click' , function(){
+updateBtn.addEventListener("click", function () {
   updateProduct();
-})
+});
 
 deleteallBtn.addEventListener("click", function () {
-  if(confirm("You want to delete all record")){
+  if (confirm("You want to delete all record")) {
     deleteAllProduct();
-  }
-  else{
+  } else {
     return;
   }
 });
 
-
-//  functions 
-
+//  functions
 
 const create = () => {
   const productObj = new ProductSchema(
@@ -62,43 +52,11 @@ const create = () => {
 
   // allProducts.push(productObj);
   // localStorage.setItem("products", JSON.stringify(allProducts));
-  db.collection('products').add(Object.assign({}, productObj));
-  
+  db.collection("products").add(Object.assign({}, productObj));
+  console.log(productObj);
   clearFields();
   read();
 };
-
-const read = () => {
-  allProducts = [];
-  // allProducts = JSON.parse(localStorage.getItem("products"));
-  db.collection('products').get()
-    .then((snapshot)=>{
-      snapshot.forEach(doc=>{
-        allProducts.push(doc.data());
-      });
-      createTable();
-    })
-    .catch(err=>{
-      console.log(err);
-    });
-};
-
-const createTable = ()=>{
-  let html = "";
-  let sno = 1;
-  allProducts.forEach((product) => {
-    html += `<tr class="parent-row"><th scope="row">${sno}</th>
-        <td class=""># ${product.productId}</td>
-        <td>${product.productname}</td>
-        <td>${product.seller}</td>
-        <td>₹ ${numberWithCommas(product.price)}</td>
-        <td><i class="fas fa-edit btnedit" id="${product.uuid}" onclick="editProduct(this.id)"></i></td>
-        <td><a class="btn-delete"><i class="fas fa-trash-alt btn-delete" id="${product.uuid}"onclick="deleteProduct(this.id)"></i></a></td></tr>
-        `;
-    sno++;
-  });
-  document.getElementById("root").innerHTML = html;
-}
 
 const clearFields = () => {
   pId.value = "";
@@ -107,35 +65,76 @@ const clearFields = () => {
   price.value = "";
 };
 
-const editProduct = (uid)=>{
-    // allProducts = [];
-    // allProducts = JSON.parse(localStorage.getItem("products"));
-    if(allProducts.length == 0){
-      db.collection('products').get()
-        .then((snapshot)=>{
-          snapshot.forEach(doc=>{
-            allProducts.push(doc.data());
-          });
-        })
-        .catch(err=>{
-          console.log(err);
+const read = () => {
+  allProducts = [];
+  // allProducts = JSON.parse(localStorage.getItem("products"));
+  db.collection("products")
+    .get()
+    .then((snapshot) => {
+      snapshot.forEach((doc) => {
+        const newObj = Object.assign({}, doc.data());
+        newObj.firebaseId = doc.id;
+        allProducts.push(newObj);
+      });
+      createTable();
+      console.log(allProducts);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const createTable = () => {
+  let html = "";
+  let sno = 1;
+  allProducts.forEach((product) => {
+    html += `<tr class="parent-row"><th scope="row">${sno}</th>
+        <td class=""># ${product.productId}</td>
+        <td>${product.productname}</td>
+        <td>${product.seller}</td>
+        <td>₹ ${numberWithCommas(product.price)}</td>
+        <td><i class="fas fa-edit btnedit" id="${
+          product.uuid
+        }" onclick="editProduct(this.id)"></i></td>
+        <td><a class="btn-delete"><i class="fas fa-trash-alt btn-delete" id="${
+          product.uuid
+        }"onclick="deleteProduct(this.id)"></i></a></td></tr>
+        `;
+    sno++;
+  });
+  document.getElementById("root").innerHTML = html;
+};
+
+const editProduct = (uid) => {
+  // allProducts = [];
+  // allProducts = JSON.parse(localStorage.getItem("products"));
+  if (allProducts.length == 0) {
+    db.collection("products")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          allProducts.push(doc.data());
         });
-    }
-    const index = allProducts.findIndex(product=>product.uuid == uid);
-    const productObj = allProducts[index];
-    localStorage.setItem('currentKey',uid);
-    fillValues(productObj);
-}
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  const index = allProducts.findIndex((product) => product.uuid == uid);
+  const productObj = allProducts[index];
+  localStorage.setItem("currentKey", uid);
+  fillValues(productObj);
+};
 
 const fillValues = (productObj) => {
   pId.value = productObj.pId;
   pName.value = productObj.productname;
   seller.value = productObj.seller;
   price.value = productObj.price;
-}
+};
 
-const updateProduct = ()=>{
-  const uuid = localStorage.getItem('currentKey');
+const updateProduct = () => {
+  const uuid = localStorage.getItem("currentKey");
   const updateProductObj = new ProductSchema(
     pId.value,
     pName.value,
@@ -143,33 +142,63 @@ const updateProduct = ()=>{
     price.value,
     uuid
   );
-  
+
   if (!updateProductObj.checkBlank()) {
     updateProductObj.showAlert();
     return;
   }
-  const index = allProducts.findIndex(product=>product.uuid == uuid);
+  const index = allProducts.findIndex((product) => product.uuid == uuid);
   allProducts[index] = updateProductObj;
   localStorage.setItem("products", JSON.stringify(allProducts));
 
   clearFields();
   read();
-
-}
+};
 
 const deleteProduct = (uid) => {
-  allProducts = [];
-  allProducts = JSON.parse(localStorage.getItem("products"));
-  const index = allProducts.findIndex(product=>product.uuid == uid);
-  allProducts.splice(index,1); 
-  localStorage.setItem("products", JSON.stringify(allProducts));
-  read();
+  // allProducts = [];
+  // allProducts = JSON.parse(localStorage.getItem("products"));
+  console.log(allProducts);
+  const index = allProducts.findIndex((product) => product.uuid == uid);
+  // allProducts.splice(index,1);
+  // localStorage.setItem("products", JSON.stringify(allProducts));
+  const obj = allProducts[index];
+  const firebaseDocId = obj.firebaseId;
+  db.collection("products")
+    .doc(firebaseDocId)
+    .delete()
+    .then((data) => {
+      console.log(data);
+      read();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  // read();
 };
 
 const deleteAllProduct = () => {
   allProducts = [];
-  localStorage.setItem("products", JSON.stringify(allProducts));
-  read();
+  // localStorage.setItem("products", JSON.stringify(allProducts));
+  db.collection("products")
+    .get()
+    .then((snapshot) => {
+      snapshot.forEach((doc) => {
+        db.collection("products")
+          .doc(doc.id)
+          .delete()
+          .then(() => {
+            console.log("Delete SuccessFully");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+      read();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 // Function for unique ID
@@ -187,11 +216,8 @@ function UUID() {
   return uuid;
 }
 
-
 // Function for commas
 
 function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
-
-

@@ -1,10 +1,11 @@
 class ProductSchema {
-  constructor(productId, productname, seller, price,uuid) {
+  constructor(productId, productname, seller, price, uuid) {
     this.productId = productId;
     this.productname = productname;
     this.seller = seller;
     this.price = price;
     this.uuid = uuid;
+    this.firebaseId = "";
   }
 
   checkBlank() {
