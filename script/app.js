@@ -11,6 +11,9 @@ const createBtn = document.getElementById("btn-create");
 const readBtn = document.getElementById("btn-read");
 const updateBtn = document.getElementById("btn-update");
 const deleteallBtn = document.getElementById("btn-deleteall");
+const commonLoader = document.querySelector('.common-loader');
+
+
 
 let allProducts = [];
 
@@ -33,6 +36,14 @@ deleteallBtn.addEventListener("click", function () {
     return;
   }
 });
+
+function showLoader(){
+  commonLoader.style.display = 'flex';
+}
+
+function hideLoader(){
+  commonLoader.style.display = 'none';
+}
 
 //  functions
 
@@ -66,6 +77,7 @@ const clearFields = () => {
 };
 
 const read = () => {
+  showLoader();
   allProducts = [];
   // allProducts = JSON.parse(localStorage.getItem("products"));
   db.collection("products")
@@ -78,8 +90,10 @@ const read = () => {
       });
       createTable();
       console.log(allProducts);
+      hideLoader();
     })
     .catch((err) => {
+      hideLoader();
       console.log(err);
     });
 };
@@ -106,6 +120,9 @@ const createTable = () => {
 };
 
 const editProduct = (uid) => {
+  createBtn.disabled = true;
+  readBtn.disabled = true;
+  deleteallBtn.disabled = true;
   // allProducts = [];
   // allProducts = JSON.parse(localStorage.getItem("products"));
   if (allProducts.length == 0) {
@@ -127,14 +144,20 @@ const editProduct = (uid) => {
 };
 
 const fillValues = (productObj) => {
-  pId.value = productObj.pId;
+  pId.value = productObj.productId;
   pName.value = productObj.productname;
   seller.value = productObj.seller;
   price.value = productObj.price;
 };
 
 const updateProduct = () => {
+  createBtn.disabled = false;
+  readBtn.disabled = false;
+  deleteallBtn.disabled = false;
+  showLoader();
+
   const uuid = localStorage.getItem("currentKey");
+
   const updateProductObj = new ProductSchema(
     pId.value,
     pName.value,
@@ -148,8 +171,20 @@ const updateProduct = () => {
     return;
   }
   const index = allProducts.findIndex((product) => product.uuid == uuid);
-  allProducts[index] = updateProductObj;
-  localStorage.setItem("products", JSON.stringify(allProducts));
+  const firebaseId = allProducts[index].firebaseId;
+  db.collection("products")
+    .doc(firebaseId)
+    .set(Object.assign({}, updateProductObj))
+    .then(() => {
+      console.log("Product Update");
+      hideLoader();
+    })
+    .catch((err) => {
+      console.log(err);
+      hideLoader();
+    });
+  // allProducts[index] = updateProductObj;
+  // localStorage.setItem("products", JSON.stringify(allProducts));
 
   clearFields();
   read();
